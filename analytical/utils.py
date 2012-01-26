@@ -142,6 +142,19 @@ def disable_html(html, service):
     """
     return HTML_COMMENT % {'html': html, 'service': service}
 
+def on_debug_mode():
+    """
+    Return a constant from ``django.conf.settings`` METRICS_DISABLED. If the constant from
+    settings is not set, the value is equal to settings.DEBUG
+    """
+    try:
+        metrics_disabled = getattr(settings, 'METRICS_DISABLED')
+    except AttributeError:
+        try:
+            metrics_disabled = value = getattr(settings, 'DEBUG')
+        except AttributeError:
+            raise AnalyticalException("METRICS_DISABLED and DEBUG setting: not found")
+    return metrics_disabled
 
 class AnalyticalException(Exception):
     """

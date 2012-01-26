@@ -10,7 +10,7 @@ from django.template import Library, Node, TemplateSyntaxError
 from django.utils import simplejson
 
 from analytical.utils import is_internal_ip, disable_html, get_identity, \
-        get_required_setting
+        get_required_setting, on_debug_mode
 
 
 API_KEY_RE = re.compile(r'^[0-9a-f]{40}$')
@@ -81,7 +81,7 @@ class KissMetricsNode(Node):
             pass
         html = TRACKING_CODE % {'api_key': self.api_key,
                 'commands': " ".join(commands)}
-        if is_internal_ip(context, 'KISS_METRICS'):
+        if is_internal_ip(context, 'KISS_METRICS') or on_debug_mode():
             html = disable_html(html, 'KISSmetrics')
         return html
 
