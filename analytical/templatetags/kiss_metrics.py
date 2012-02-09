@@ -56,6 +56,7 @@ def kiss_metrics(parser, token):
         raise TemplateSyntaxError("'%s' takes no arguments" % bits[0])
     return KissMetricsNode()
 
+
 class KissMetricsNode(Node):
     def __init__(self):
         self.api_key = get_required_setting('KISS_METRICS_API_KEY',
@@ -68,8 +69,8 @@ class KissMetricsNode(Node):
         if identity is not None:
             commands.append(IDENTIFY_CODE % identity)
         try:
-            name, properties = context[EVENT_CONTEXT_KEY]
-            commands.append(EVENT_CODE % {'name': name,
+            for name, properties in context[EVENT_CONTEXT_KEY]:
+                commands.append(EVENT_CODE % {'name': name,
                     'properties': simplejson.dumps(properties)})
         except KeyError:
             pass
