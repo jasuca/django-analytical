@@ -66,12 +66,21 @@ class KissMetricsNode(Node):
     def render(self, context):
         commands = []
         identity = get_identity(context, 'kiss_metrics')
+        
         if identity is not None:
             commands.append(IDENTIFY_CODE % identity)
         try:
-            for name, properties in context[EVENT_CONTEXT_KEY]:
+            
+            if len(context[EVENT_CONTEXT_KEY])>=0 and type(context[EVENT_CONTEXT_KEY][0])==type(""):
+                #old format
+                name, properties = context[EVENT_CONTEXT_KEY]
                 commands.append(EVENT_CODE % {'name': name,
-                    'properties': simplejson.dumps(properties)})
+                        'properties': simplejson.dumps(properties)})
+            else:
+                #new format
+                for name, properties in context[EVENT_CONTEXT_KEY]:
+                    commands.append(EVENT_CODE % {'name': name,
+                        'properties': simplejson.dumps(properties)})
         except KeyError:
             pass
         try:
