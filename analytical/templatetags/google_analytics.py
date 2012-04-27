@@ -10,7 +10,8 @@ from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError
 
 from analytical.utils import is_internal_ip, disable_html, \
-        get_required_setting, get_domain, AnalyticalException
+        get_required_setting, get_domain, AnalyticalException, on_debug_mode
+
 
 def enumerate(sequence, start=0):
     """Copy of the Python 2.6 `enumerate` builtin for compatibility."""
@@ -68,6 +69,7 @@ def google_analytics(parser, token):
         raise TemplateSyntaxError("'%s' takes no arguments" % bits[0])
     return GoogleAnalyticsNode()
 
+
 class GoogleAnalyticsNode(Node):
     def __init__(self):
         self.property_id = get_required_setting(
@@ -80,7 +82,7 @@ class GoogleAnalyticsNode(Node):
         commands.extend(self._get_other_commands(context))
         html = SETUP_CODE % {'property_id': self.property_id,
                 'commands': " ".join(commands)}
-        if is_internal_ip(context, 'GOOGLE_ANALYTICS'):
+        if is_internal_ip(context, 'GOOGLE_ANALYTICS') or on_debug_mode():
             html = disable_html(html, 'Google Analytics')
         return html
 
@@ -121,6 +123,7 @@ class GoogleAnalyticsNode(Node):
         if getattr(settings, 'GOOGLE_ANALYTICS_SITE_SPEED', False):
             commands.append(SITE_SPEED_CODE)
         return commands
+
 
 def contribute_to_analytical(add_node):
     GoogleAnalyticsNode()  # ensure properly configured
